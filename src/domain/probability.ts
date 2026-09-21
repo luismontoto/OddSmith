@@ -1,3 +1,3 @@
 export function successProbability(threshold: number): number {
-    return 0.5
+    return  0.5;
 }
