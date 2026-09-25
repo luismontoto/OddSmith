@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { resolveSequence } from './game'
+import { resolveSequence, resolveAttack } from './game'
 
 describe('resolveSequence', () => {
     it('applies a single success step to the initial count', () => {
@@ -16,13 +16,16 @@ describe('resolveSequence', () => {
         expect(result).toBeCloseTo(8)
     })
 
-    it('applies multiple steps', () => {
+    it('applies multiple success steps (hit then wound)', () => {
         const result = resolveSequence(20, [
             { threshold: 3, countsAs: 'success' },
-            { threshold: 4, countsAs: 'failure' }
+            { threshold: 4, countsAs: 'success' }
         ])
         expect(result).toBeCloseTo(6.6666)
     })
+})
+
+describe('resolveAttack', () => {
     it('resolves a full attack with damage and no FNP', () => {
         const result = resolveAttack(
             10,

@@ -14,3 +14,14 @@ export function resolveSequence(initialCount: number, steps: Step[]): number {
     }
     return count;
 }
+
+export function resolveAttack(
+    initialCount: number,
+    preDamageSteps: Step[],
+    damage: number,
+    postDamageSteps: Step[]
+): number {
+    const notSaved = resolveSequence(initialCount, preDamageSteps);
+    const damagePoints = notSaved * damage;
+    return resolveSequence(damagePoints, postDamageSteps);
+}
