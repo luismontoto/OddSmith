@@ -41,4 +41,19 @@ describe('resolveAttack', () => {
         )
         expect(result).toBeCloseTo(40 / 9)
     })
+    it('resolves a full attack with an active FNP', () => {
+        const result = resolveAttack(
+            10,
+            [
+                { threshold: 3, countsAs: 'success' },
+                { threshold: 4, countsAs: 'success' },
+                { threshold: 5, countsAs: 'failure' },
+            ],
+            2,
+            [
+                { threshold: 5, countsAs: 'failure' }, // FNP 5+
+            ]
+        )
+        expect(result).toBeCloseTo(80/27)
+    })
 })
