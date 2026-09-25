@@ -23,4 +23,19 @@ describe('resolveSequence', () => {
         ])
         expect(result).toBeCloseTo(6.6666)
     })
+    it('resolves a full attack with damage and no FNP', () => {
+        const result = resolveAttack(
+            10,
+            [
+                { threshold: 3, countsAs: 'success' }, // hit
+                { threshold: 4, countsAs: 'success' }, // wound
+                { threshold: 5, countsAs: 'failure' }, // save
+            ],
+            2, // damage
+            [
+                { threshold: 7, countsAs: 'failure' }, // no FNP
+            ]
+        )
+        expect(result).toBeCloseTo(40 / 9)
+    })
 })
