@@ -23,7 +23,22 @@ it('reports the whole list with only the edited step changed', async () => {
         { threshold: 2, countsAs: 'failure' },
     ])
 })
+it('appends a default step when "Añadir paso" is clicked', async () => {
+    const onChange = vi.fn()
+    render(
+        <StepList
+            steps={[{ threshold: 3, countsAs: 'success' }]}
+            onChange={onChange}
+        />,
+    )
 
+    await userEvent.click(screen.getByRole('button', { name: 'Añadir paso' }))
+
+    expect(onChange).toHaveBeenCalledWith([
+        { threshold: 3, countsAs: 'success' },
+        { threshold: 4, countsAs: 'success' },
+    ])
+})
 it('renders one row per step', () => {
     render(
         <StepList
