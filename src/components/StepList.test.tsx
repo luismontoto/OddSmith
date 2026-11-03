@@ -52,3 +52,19 @@ it('renders one row per step', () => {
 
     expect(screen.getAllByLabelText('Umbral')).toHaveLength(2)
 })
+it('removes the step whose "Quitar" button is clicked', async () => {
+    const onChange = vi.fn()
+    render(
+        <StepList
+            steps={[
+                { threshold: 3, countsAs: 'success' },
+                { threshold: 5, countsAs: 'failure' },
+            ]}
+            onChange={onChange}
+        />,
+    )
+
+    await userEvent.click(screen.getByRole('button', { name: 'Quitar paso 2' }))
+
+    expect(onChange).toHaveBeenCalledWith([{ threshold: 3, countsAs: 'success' }])
+})
