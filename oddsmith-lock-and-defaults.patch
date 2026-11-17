@@ -1,0 +1,100 @@
+diff --git a/src/App.tsx b/src/App.tsx
+index 8d28ea7..7a28c6f 100644
+--- a/src/App.tsx
++++ b/src/App.tsx
+@@ -8,6 +8,9 @@ const INITIAL_PRE_DAMAGE: Step[] = [
+   { threshold: 4, countsAs: 'success' }, // herir
+ ]
+ 
++// Salvaciones y FNP reducen el daño: cuentan como fallo del atacante.
++const NEW_DEFENCE_STEP: Step = { threshold: 4, countsAs: 'failure' }
++
+ function App() {
+   const [attacks, setAttacks] = useState(10)
+   const [damage, setDamage] = useState(1)
+@@ -47,11 +50,13 @@ function App() {
+         title="Antes del daño"
+         steps={preDamage}
+         minSteps={2}
++        newStep={NEW_DEFENCE_STEP}
+         onChange={setPreDamage}
+       />
+       <StepList
+         title="Después del daño"
+         steps={postDamage}
++        newStep={NEW_DEFENCE_STEP}
+         onChange={setPostDamage}
+       />
+ 
+diff --git a/src/components/StepList.tsx b/src/components/StepList.tsx
+index 555c9a7..223ee69 100644
+--- a/src/components/StepList.tsx
++++ b/src/components/StepList.tsx
+@@ -1,12 +1,13 @@
+ import type { Step } from '../domain/types'
+ import { StepRow } from './StepRow'
+ 
+-const DEFAULT_STEP: Step = { threshold: 4, countsAs: 'success' }
++const FALLBACK_STEP: Step = { threshold: 4, countsAs: 'success' }
+ 
+ type StepListProps = {
+   title?: string
+   steps: Step[]
+   minSteps?: number
++  newStep?: Step
+   onChange: (steps: Step[]) => void
+ }
+ 
+@@ -14,6 +15,7 @@ export function StepList({
+   title,
+   steps,
+   minSteps = 0,
++  newStep = FALLBACK_STEP,
+   onChange,
+ }: StepListProps) {
+   return (
+@@ -24,6 +26,7 @@ export function StepList({
+           <span className="step-number">{index + 1}</span>
+           <StepRow
+             step={step}
++            countsAsLocked={index < minSteps}
+             onChange={(updated) =>
+               onChange(steps.map((s, i) => (i === index ? updated : s)))
+             }
+@@ -39,7 +42,7 @@ export function StepList({
+           )}
+         </div>
+       ))}
+-      <button type="button" onClick={() => onChange([...steps, DEFAULT_STEP])}>
++      <button type="button" onClick={() => onChange([...steps, newStep])}>
+         Añadir paso
+       </button>
+     </section>
+diff --git a/src/components/StepRow.tsx b/src/components/StepRow.tsx
+index 7092561..6e4713d 100644
+--- a/src/components/StepRow.tsx
++++ b/src/components/StepRow.tsx
+@@ -14,9 +14,14 @@ const thresholdLabel = (t: Threshold) => (t === 7 ? '7 (nunca)' : `${t}+`)
+ type StepRowProps = {
+   step: Step
+   onChange: (step: Step) => void
++  countsAsLocked?: boolean
+ }
+ 
+-export function StepRow({ step, onChange }: StepRowProps) {
++export function StepRow({
++  step,
++  onChange,
++  countsAsLocked = false,
++}: StepRowProps) {
+   const id = useId()
+   const thresholdId = `${id}-threshold`
+   const countsAsId = `${id}-counts-as`
+@@ -45,6 +50,7 @@ export function StepRow({ step, onChange }: StepRowProps) {
+         <select
+           id={countsAsId}
+           value={step.countsAs}
++          disabled={countsAsLocked}
+           onChange={(e) =>
+             onChange({ ...step, countsAs: e.target.value as Step['countsAs'] })
+           }

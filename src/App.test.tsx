@@ -8,7 +8,7 @@ it('derives the result from the steps', async () => {
 
   expect(screen.getByRole('status')).toHaveTextContent('2.50')
 
-  const preDamage = screen.getByRole('region', { name: 'Antes del daño' })
+  const preDamage = screen.getByRole('region', { name: 'Atacante' })
   await userEvent.click(
     within(preDamage).getByRole('button', { name: 'Añadir paso' }),
   )

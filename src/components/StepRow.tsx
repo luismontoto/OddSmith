@@ -14,9 +14,14 @@ const thresholdLabel = (t: Threshold) => (t === 7 ? '7 (nunca)' : `${t}+`)
 type StepRowProps = {
   step: Step
   onChange: (step: Step) => void
+  countsAsLocked?: boolean
 }
 
-export function StepRow({ step, onChange }: StepRowProps) {
+export function StepRow({
+  step,
+  onChange,
+  countsAsLocked = false,
+}: StepRowProps) {
   const id = useId()
   const thresholdId = `${id}-threshold`
   const countsAsId = `${id}-counts-as`
@@ -45,6 +50,7 @@ export function StepRow({ step, onChange }: StepRowProps) {
         <select
           id={countsAsId}
           value={step.countsAs}
+          disabled={countsAsLocked}
           onChange={(e) =>
             onChange({ ...step, countsAs: e.target.value as Step['countsAs'] })
           }

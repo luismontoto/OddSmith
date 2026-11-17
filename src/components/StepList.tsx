@@ -1,12 +1,13 @@
 import type { Step } from '../domain/types'
 import { StepRow } from './StepRow'
 
-const DEFAULT_STEP: Step = { threshold: 4, countsAs: 'success' }
+const FALLBACK_STEP: Step = { threshold: 4, countsAs: 'success' }
 
 type StepListProps = {
   title?: string
   steps: Step[]
   minSteps?: number
+  newStep?: Step
   onChange: (steps: Step[]) => void
 }
 
@@ -14,6 +15,7 @@ export function StepList({
   title,
   steps,
   minSteps = 0,
+  newStep = FALLBACK_STEP,
   onChange,
 }: StepListProps) {
   return (
@@ -24,6 +26,7 @@ export function StepList({
           <span className="step-number">{index + 1}</span>
           <StepRow
             step={step}
+            countsAsLocked={index < minSteps}
             onChange={(updated) =>
               onChange(steps.map((s, i) => (i === index ? updated : s)))
             }
@@ -39,7 +42,7 @@ export function StepList({
           )}
         </div>
       ))}
-      <button type="button" onClick={() => onChange([...steps, DEFAULT_STEP])}>
+      <button type="button" onClick={() => onChange([...steps, newStep])}>
         Añadir paso
       </button>
     </section>

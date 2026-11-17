@@ -7,6 +7,8 @@ const INITIAL_PRE_DAMAGE: Step[] = [
   { threshold: 4, countsAs: 'success' }, // impactar
   { threshold: 4, countsAs: 'success' }, // herir
 ]
+// Salvaciones y FNP reducen el daño: cuentan como fallo del atacante.
+const NEW_DEFENCE_STEP: Step = { threshold: 4, countsAs: 'failure' }
 
 function App() {
   const [attacks, setAttacks] = useState(10)
@@ -43,17 +45,19 @@ function App() {
         </div>
       </div>
 
-      <StepList
-        title="Antes del daño"
-        steps={preDamage}
-        minSteps={2}
-        onChange={setPreDamage}
-      />
-      <StepList
-        title="Después del daño"
-        steps={postDamage}
-        onChange={setPostDamage}
-      />
+        <StepList
+            title="Atacante"
+            steps={preDamage}
+            minSteps={2}
+            newStep={NEW_DEFENCE_STEP}
+            onChange={setPreDamage}
+        />
+        <StepList
+            title="Defensor"
+            steps={postDamage}
+            newStep={NEW_DEFENCE_STEP}
+            onChange={setPostDamage}
+        />
 
       <div className="result">
         <span>Daño esperado</span>
