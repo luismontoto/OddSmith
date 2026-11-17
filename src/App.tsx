@@ -1,31 +1,65 @@
 import { useState } from 'react'
 import { StepList } from './components/StepList'
-import { resolveSequence } from './domain/game'
+import { resolveAttack } from './domain/game'
 import type { Step } from './domain/types'
+
+const INITIAL_PRE_DAMAGE: Step[] = [
+  { threshold: 4, countsAs: 'success' }, // impactar
+  { threshold: 4, countsAs: 'success' }, // herir
+]
 
 function App() {
   const [attacks, setAttacks] = useState(10)
-  const [steps, setSteps] = useState<Step[]>([])
+  const [damage, setDamage] = useState(1)
+  const [preDamage, setPreDamage] = useState<Step[]>(INITIAL_PRE_DAMAGE)
+  const [postDamage, setPostDamage] = useState<Step[]>([])
 
-  const result = resolveSequence(attacks, steps)
+  const result = resolveAttack(attacks, preDamage, damage, postDamage)
 
   return (
-      <main>
-        <h1>OddSmith</h1>
+    <main>
+      <h1>OddSmith</h1>
 
-        <label htmlFor="attacks">Ataques</label>
-        <input
+      <div className="inputs">
+        <div className="field">
+          <label htmlFor="attacks">Ataques</label>
+          <input
             id="attacks"
             type="number"
             min={0}
             value={attacks}
             onChange={(e) => setAttacks(Number(e.target.value))}
-        />
+          />
+        </div>
+        <div className="field">
+          <label htmlFor="damage">Daño por herida</label>
+          <input
+            id="damage"
+            type="number"
+            min={0}
+            value={damage}
+            onChange={(e) => setDamage(Number(e.target.value))}
+          />
+        </div>
+      </div>
 
-        <StepList steps={steps} onChange={setSteps} />
+      <StepList
+        title="Antes del daño"
+        steps={preDamage}
+        minSteps={2}
+        onChange={setPreDamage}
+      />
+      <StepList
+        title="Después del daño"
+        steps={postDamage}
+        onChange={setPostDamage}
+      />
 
+      <div className="result">
+        <span>Daño esperado</span>
         <output>{result.toFixed(2)}</output>
-      </main>
+      </div>
+    </main>
   )
 }
 
