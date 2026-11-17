@@ -14,54 +14,55 @@ const thresholdLabel = (t: Threshold) => (t === 7 ? '7 (nunca)' : `${t}+`)
 type StepRowProps = {
   step: Step
   onChange: (step: Step) => void
-  countsAsLocked?: boolean
+  hideCountsAs?: boolean
 }
 
 export function StepRow({
-  step,
-  onChange,
-  countsAsLocked = false,
-}: StepRowProps) {
+                          step,
+                          onChange,
+                          hideCountsAs = false,
+                        }: StepRowProps) {
   const id = useId()
   const thresholdId = `${id}-threshold`
   const countsAsId = `${id}-counts-as`
 
   return (
-    <div className="step-row">
-      <div className="field">
-        <label htmlFor={thresholdId}>Umbral</label>
-        <select
-          id={thresholdId}
-          value={step.threshold}
-          onChange={(e) =>
-            onChange({ ...step, threshold: Number(e.target.value) as Threshold })
-          }
-        >
-          {THRESHOLDS.map((t) => (
-            <option key={t} value={t}>
-              {thresholdLabel(t)}
-            </option>
-          ))}
-        </select>
-      </div>
+      <div className="step-row">
+        <div className="field">
+          <label htmlFor={thresholdId}>Umbral</label>
+          <select
+              id={thresholdId}
+              value={step.threshold}
+              onChange={(e) =>
+                  onChange({ ...step, threshold: Number(e.target.value) as Threshold })
+              }
+          >
+            {THRESHOLDS.map((t) => (
+                <option key={t} value={t}>
+                  {thresholdLabel(t)}
+                </option>
+            ))}
+          </select>
+        </div>
 
-      <div className="field">
-        <label htmlFor={countsAsId}>Cuenta como</label>
-        <select
-          id={countsAsId}
-          value={step.countsAs}
-          disabled={countsAsLocked}
-          onChange={(e) =>
-            onChange({ ...step, countsAs: e.target.value as Step['countsAs'] })
-          }
-        >
-          {Object.entries(COUNTS_AS_LABELS).map(([value, label]) => (
-            <option key={value} value={value}>
-              {label}
-            </option>
-          ))}
-        </select>
+        {!hideCountsAs && (
+            <div className="field">
+              <label htmlFor={countsAsId}>Cuenta como</label>
+              <select
+                  id={countsAsId}
+                  value={step.countsAs}
+                  onChange={(e) =>
+                      onChange({ ...step, countsAs: e.target.value as Step['countsAs'] })
+                  }
+              >
+                {Object.entries(COUNTS_AS_LABELS).map(([value, label]) => (
+                    <option key={value} value={value}>
+                      {label}
+                    </option>
+                ))}
+              </select>
+            </div>
+        )}
       </div>
-    </div>
   )
 }
