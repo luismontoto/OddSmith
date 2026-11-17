@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { resolveSequence, resolveAttack } from './game'
+import { resolveSequence, resolveAttack, stepProbability } from './game'
 
 describe('resolveSequence', () => {
     it('applies a single success step to the initial count', () => {
@@ -55,5 +55,15 @@ describe('resolveAttack', () => {
             ]
         )
         expect(result).toBeCloseTo(80/27)
+    })
+})
+
+describe('stepProbability', () => {
+    it('is the success chance for a success step', () => {
+        expect(stepProbability({ threshold: 4, countsAs: 'success' })).toBeCloseTo(0.5)
+    })
+
+    it('is the complement for a failure step (e.g. a save)', () => {
+        expect(stepProbability({ threshold: 5, countsAs: 'failure' })).toBeCloseTo(4 / 6)
     })
 })

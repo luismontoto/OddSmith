@@ -1,0 +1,122 @@
+diff --git a/src/components/StepList.tsx b/src/components/StepList.tsx
+index e371636..cf6d0df 100644
+--- a/src/components/StepList.tsx
++++ b/src/components/StepList.tsx
+@@ -1,3 +1,4 @@
++import { stepProbability } from '../domain/game'
+ import type { Step } from '../domain/types'
+ import { StepRow } from './StepRow'
+ 
+@@ -7,6 +8,7 @@ type StepListProps = {
+   title?: string
+   steps: Step[]
+   minSteps?: number
++  labels?: string[]
+   newStep?: Step
+   onChange: (steps: Step[]) => void
+ }
+@@ -15,6 +17,7 @@ export function StepList({
+   title,
+   steps,
+   minSteps = 0,
++  labels = [],
+   newStep = FALLBACK_STEP,
+   onChange,
+ }: StepListProps) {
+@@ -24,6 +27,7 @@ export function StepList({
+       {steps.map((step, index) => (
+         <div className="step-item" key={index}>
+           <span className="step-number">{index + 1}</span>
++          {labels[index] && <span className="step-name">{labels[index]}</span>}
+           <StepRow
+             step={step}
+             hideCountsAs={index < minSteps}
+@@ -31,6 +35,12 @@ export function StepList({
+               onChange(steps.map((s, i) => (i === index ? updated : s)))
+             }
+           />
++          <span
++            className="chance"
++            title="Probabilidad de que el ataque continúe"
++          >
++            {Math.round(stepProbability(step) * 100)} %
++          </span>
+           {index >= minSteps && (
+             <button
+               type="button"
+diff --git a/src/domain/game.test.ts b/src/domain/game.test.ts
+index a689d00..a1f5141 100644
+--- a/src/domain/game.test.ts
++++ b/src/domain/game.test.ts
+@@ -1,5 +1,5 @@
+ import { describe, it, expect } from 'vitest'
+-import { resolveSequence, resolveAttack } from './game'
++import { resolveSequence, resolveAttack, stepProbability } from './game'
+ 
+ describe('resolveSequence', () => {
+     it('applies a single success step to the initial count', () => {
+@@ -56,4 +56,14 @@ describe('resolveAttack', () => {
+         )
+         expect(result).toBeCloseTo(80/27)
+     })
+-})
+\ No newline at end of file
++})
++
++describe('stepProbability', () => {
++    it('is the success chance for a success step', () => {
++        expect(stepProbability({ threshold: 4, countsAs: 'success' })).toBeCloseTo(0.5)
++    })
++
++    it('is the complement for a failure step (e.g. a save)', () => {
++        expect(stepProbability({ threshold: 5, countsAs: 'failure' })).toBeCloseTo(4 / 6)
++    })
++})
+diff --git a/src/domain/game.ts b/src/domain/game.ts
+index d9e01d8..a92d808 100644
+--- a/src/domain/game.ts
++++ b/src/domain/game.ts
+@@ -2,15 +2,19 @@ import type { Step } from './types'
+ import { successProbability } from './probability'
+ 
+ 
++const applyStep: Record<Step['countsAs'], (p: number) => number> = {
++    success: (p) => p,
++    failure: (p) => 1 - p,
++}
++
++export function stepProbability(step: Step): number {
++    return applyStep[step.countsAs](successProbability(step.threshold));
++}
++
+ export function resolveSequence(initialCount: number, steps: Step[]): number {
+     let count = initialCount;
+     for (const step of steps) {
+-        const p = successProbability(step.threshold);
+-        const applyStep: Record<Step['countsAs'], (p: number) => number> = {
+-            success: (p) => p,
+-            failure: (p) => 1 - p,
+-        }
+-        count = count * applyStep[step.countsAs](p);
++        count = count * stepProbability(step);
+     }
+     return count;
+ }
+diff --git a/src/index.css b/src/index.css
+index cac561b..1216125 100644
+--- a/src/index.css
++++ b/src/index.css
+@@ -102,3 +102,13 @@ button:focus-visible, input:focus-visible, select:focus-visible {
+ }
+ .result span { font-weight: 600; }
+ .result output { font-size: 2.25rem; font-weight: 700; color: var(--accent); }
++
++.step-name { font-weight: 600; color: var(--text-h); min-width: 4.5rem; margin-bottom: 0.3rem; }
++.chance {
++  margin-bottom: 0.3rem;
++  padding: 0.1rem 0.6rem;
++  border-radius: 999px;
++  border: 1px solid var(--border);
++  font-variant-numeric: tabular-nums;
++  font-size: 0.85rem;
++}

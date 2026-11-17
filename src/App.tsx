@@ -51,6 +51,7 @@ function App() {
             minSteps={2}
             newStep={NEW_DEFENCE_STEP}
             onChange={setPreDamage}
+            labels={['Impactar', 'Herir']}
         />
         <StepList
             title="Defensor"

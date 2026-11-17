@@ -2,15 +2,19 @@ import type { Step } from './types'
 import { successProbability } from './probability'
 
 
+const applyStep: Record<Step['countsAs'], (p: number) => number> = {
+    success: (p) => p,
+    failure: (p) => 1 - p,
+}
+
+export function stepProbability(step: Step): number {
+    return applyStep[step.countsAs](successProbability(step.threshold));
+}
+
 export function resolveSequence(initialCount: number, steps: Step[]): number {
     let count = initialCount;
     for (const step of steps) {
-        const p = successProbability(step.threshold);
-        const applyStep: Record<Step['countsAs'], (p: number) => number> = {
-            success: (p) => p,
-            failure: (p) => 1 - p,
-        }
-        count = count * applyStep[step.countsAs](p);
+        count = count * stepProbability(step);
     }
     return count;
 }

@@ -102,3 +102,13 @@ button:focus-visible, input:focus-visible, select:focus-visible {
 }
 .result span { font-weight: 600; }
 .result output { font-size: 2.25rem; font-weight: 700; color: var(--accent); }
+
+.step-name { font-weight: 600; color: var(--text-h); min-width: 4.5rem; margin-bottom: 0.3rem; }
+.chance {
+  margin-bottom: 0.3rem;
+  padding: 0.1rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.85rem;
+}
